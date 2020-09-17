@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        <div id="app" >
+            <h1>【Github URL 轉 Azure Deploy URL】</h1>
+            <p>Github Deploy.json 的 URL : </p>
+            <input type="text" v-model='text' style="width:100%"/>
+            
+            <p>Azure Deploy URL (請複製到瀏覽器貼上即可) : </p>
+            <div >{{convertText}}</div>
+        </div>
+        
+        <script src="index.js"></script>
+    </body>
+    <script>
+      var app = new Vue({ 
+          el: '#app',
+          computed: {
+              convertText: function () {
+                  let s = this.text;
+                  s = s.replaceAll("https://github.com/","https://raw.githubusercontent.com/")
+                      .replaceAll("blob","")
+                      .replaceAll(":","%3A")
+                      .replaceAll("/","%2F")
+                  ;
+                  return "https://portal.azure.com/#create/Microsoft.Template/uri/" + s;
+              }        
+          },    
+          data: {
+              text: 'https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json'
+          }
+      });    
+    </script>
+</html>
