@@ -1,5 +1,6 @@
 【深入 Azure 雲端服務】
 ---
+<a name="page1"></a>
 ## 簡介、目錄
 
 
@@ -17,7 +18,7 @@
 
 預計主題、目錄 : 
 
-1.  [Azure 範本 ARM Template - 基礎](##Azure 範本 ARM Template - 基礎)
+1. Azure 範本 ARM Template - 基礎 
 2. Azure 範本 ARM Template - 進階
 3. Azure 自動化入門- 動態屬性生成
 4. Azure CLI 基礎
@@ -54,6 +55,7 @@
 
 
 ---
+<a name="page2"></a>
 ## Azure 範本 ARM Template - 基礎
 
 使用 Azure Portal 建立資源雖然有方便的GUI，但是需要經過一些專業的設定後才能正式上線，這些對於客戶、新人`需要有學習成本`，讓他們自行設定又會有`人為出錯的風險`。為此微軟提供 [ARM (Azure Resource Manager) Template](https://docs.microsoft.com/zh-tw/azure/azure-resource-manager/templates/overview)  讓維運、開發人員能建立標準化範本`只需要幾個文件，任何人都可以簡單部屬類似環境`。
@@ -107,6 +109,7 @@ ARM Template 入門的使用方式非常簡單，以建立一個 VM 為例子，
 ![image](https://user-images.githubusercontent.com/12729184/93489349-fcec0600-f939-11ea-8fb2-928befa1ed86.png)
 
 ---
+<a name="page3"></a>
 ## Azure 範本 ARM Template -  進階
 
 前面介紹了給客戶、新人的`簡單範本`分享跟建立方式，跟了解基本範本化的概念、好處，接下來進階了解 Template 的一些細節概念。
@@ -291,6 +294,7 @@ Q2的問題，我們可以使用  `parameters` + `defaultValue、min(max)Length`
 
 
 ---
+<a name="page4"></a>
 ## Azure 自動化入門- 動態屬性生成
 
 
