@@ -17,7 +17,7 @@
 
 預計主題、目錄 : 
 
-1. Azure 範本 ARM Template - 基礎
+1.  [Azure 範本 ARM Template - 基礎](##Azure 範本 ARM Template - 基礎)
 2. Azure 範本 ARM Template - 進階
 3. Azure 自動化入門- 動態屬性生成
 4. Azure CLI 基礎
