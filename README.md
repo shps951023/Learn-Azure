@@ -21,7 +21,7 @@
 1. Azure 範本 ARM Template - 基礎 
 2. Azure 範本 ARM Template - 進階
 3. Azure 自動化入門- 動態屬性生成
-4. Azure CLI 基礎
+4. Azure CLI 入門、工具使用
 5. Azure CLI 實作
 6. Azure CLI 進階
 7. Power Shell + Azure CLI 編寫批量腳本 - 基礎
@@ -383,5 +383,56 @@ Azure 在此有提供 `concat + uniqueString + guid`方式可以解決此問題
 
 
 > 備註 : 想查詢所有 funtion 可以在 [Template functions ](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions)查詢
+
+---
+<a name="page5"></a>
+## Azure CLI 入門、工具使用
+
+
+
+本節建議看演示影片最快  :  
+[![Yes](https://img.youtube.com/vi/SplY5-xcGSs/0.jpg)](https://www.youtube.com/watch?v=SplY5-xcGSs)
+
+
+
+---
+
+
+
+Azure 想要做到完全自動化，最強的原裝搭配就是 `ARM Template + Azure CLI + PowerShell (or Bash)` ! 
+
+所以接著先介紹 Azure CLI，首先工欲善其事，必先利其器，總共有兩個工具推薦使用 
+
+1. Azure Portal Cloud Shell
+2. 本機 Visaul Studio Code + Azure CLI 安裝
+
+
+
+我們先從前者 Cloud Shell 開始介紹，其特點是 `開箱即用`、`Azure CLI環境都先安裝好`，只需要打開網頁 [https://shell.azure.com/](https://shell.azure.com/) 並配上 `code .` 打開 VSCode Online。
+
+並依照之前的範本創建一個 Template JSON，並輸入以下 Azure CLI 命令
+
+```
+az group create --name demo --location eastasia
+az deployment group create --resource-group demo --template-file demo.json
+```
+
+![image-20200920221055135](https://i.loli.net/2020/09/20/Wg6BkfENxsRjyIM.png)
+
+
+
+接著介紹微軟強大的開源工具 `Visual Studio Code 加 Azure CLI `搭建本機的開發環境
+
+1.安裝 [Visual Studio Code](https://code.visualstudio.com/)
+
+2.安裝 [Azure CLI ](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest&tabs=azure-cli)
+
+3.安裝整合套件 [Azure Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-node-azure-pack)
+
+
+
+![image-20200920233056490](https://i.loli.net/2020/09/20/DfdZGwRH6Qck3as.png)
+
+ 
 
 
