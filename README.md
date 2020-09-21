@@ -16,13 +16,35 @@
 
 
 
-預計主題、目錄 : 
+----
+
+
+
+## 本系列簡介
+
+不知道大家有沒有用過線上測試服務、或是雲端軟體?
+
+以 [Odoo](https://www.odoo.com/?utm_source=google&utm_medium=cpc&utm_campaign=Branding-English_Brand-Odoo&utm_term=odoo&utm_matchtype=e&utm_device=c&utm_gclid=Cj0KCQjwnqH7BRDdARIsACTSAdt1dDeuJWxuihPtlEpTirgSfnM_Z_tAd5BWdrLLGMamNh_iES9lMWQaArEuEALw_wcB&gclid=Cj0KCQjwnqH7BRDdARIsACTSAdt1dDeuJWxuihPtlEpTirgSfnM_Z_tAd5BWdrLLGMamNh_iES9lMWQaArEuEALw_wcB)、為例子，假如自己在電腦架設需要安裝 python、postgresql 花很多時間做一堆設定
+
+但在 Odoo 官網只需要 Mail 註冊、點幾個按鈕，一個線上的ERP服務就架設起來，並且時間一到自動刪除資源，好不方便!
+
+像這樣的功能，藉由 Azure 我們也可以辦，並且細部控制商業環境最重要的`成本`問題，從`免費到低到漸進式費用增長`。
+
+
+
+本系列將會帶大家如何`從無到有、腳本自動化`建立類似的服務，但需要讀者們循序漸進跟著文章動手實作。
+
+
+
+---
+
+## 預計主題、目錄 : 
 
 1. Azure 範本 ARM Template - 基礎 
 2. Azure 範本 ARM Template - 進階
 3. Azure 自動化入門- 動態屬性生成
 4. Azure CLI 入門、工具使用
-5. Azure CLI 實作
+5. Azure CLI ❤ Linux 
 6. Azure CLI 進階
 7. Power Shell + Azure CLI 編寫批量腳本 - 基礎
 8. Power Shell + Azure CLI 編寫批量腳本 - 進階
@@ -53,6 +75,22 @@
 33. 應用: 客制公司專屬戰情中心 - 上線
 
 
+
+
+
+<!--
+
+TODO:補充自動化目的 : 有沒有看過 Azure 
+
+TODO:docker + web app + azure cli + power shell 快速發布
+
+TODO: 使用雲端對我的目的 : 賺錢、省錢 XD
+
+TODO: 實作出像是 雲端小ERP 服務功能，需要找一款合適的免費ERP，或是實作 odoo demo 功能
+
+​      - 使用 mail 驗證開啟主機功能、定時刪除
+
+-->
 
 ---
 <a name="page2"></a>
@@ -434,5 +472,109 @@ az deployment group create --resource-group demo --template-file demo.json
 ![image-20200920233056490](https://i.loli.net/2020/09/20/DfdZGwRH6Qck3as.png)
 
  
+
+---
+<a name="page6"></a>
+## Azure CLI ❤ Linux 
+
+
+
+演示影片 : 
+
+[![Yes](https://img.youtube.com/vi/SNIjjJ7aW-U/0.jpg)](https://www.youtube.com/watch?v=SNIjjJ7aW-U)
+
+
+
+---
+
+近年來隨著微軟擁抱開源社群 : Microsoft ❤ Linux ，在 Azure 上面我們也可以使用 Linux 的 Bash 來幫助我們完成維運腳本的編寫。
+
+為什麼能這樣做呢? 
+
+一個重要的概念 :  `Azure Cloud Shell 底層就是 Ubuntu Linux`
+
+<!--
+
+```
+cat /etc/os-release
+```
+
+-->
+
+![image-20200921224250563](https://i.loli.net/2020/09/21/JTjiEoeBFDxpVUs.png)
+
+這也代表說，管理 Azure 不必要綁死在 Windows，其他支持 Bash 的平台都能使用，達到`跨平台管理`的效果，這點真的很棒 !
+
+
+
+接著讓我們向 Azure 說你好
+
+最簡單方式 : 在 [Azuer Cloud Shell](https://shell.azure.com/) 選擇 Bash 就可以簡單使用 Shell 指令
+
+```bash
+#!/bin/bash
+for (( i=1; i<=10; i++ ))
+do  
+   echo "Hello Azure IT Help $i times"
+done
+```
+
+![image-20200921221835818](https://i.loli.net/2020/09/21/FBTL6RZW7uyxOab.png)
+
+
+
+再來做一個批量管理資源的例子 :  在 Azure 做`批量建立、刪除`的動作，一次性建立、刪除10個群組，我們可以這樣做
+
+```bash
+# 創建批量建立群組shell
+weihan@Azure:~$ vim demo.sh
+#!/bin/bash
+for (( i=1; i<=10; i++ ))
+do  
+   az group create --name "demo$i" --location eastasia
+   echo "Create $i Azure Group"
+done
+
+# 執行創建
+weihan@Azure:~$ bash demo.sh
+Create 1 Azure Group
+..
+Create 10 Azure Group
+
+# 查詢結果
+weihan@Azure:~$ az group list --query "[]" -o table
+Name    Location
+------  ----------
+demo1   eastasia
+demo2   eastasia
+...
+demo10  eastasia
+
+# 批量刪除
+weihan@Azure:~$ touch demo1.sh
+weihan@Azure:~$ code demo1.sh
+
+# 創建批量刪除群組shell
+#!/bin/bash
+for (( i=1; i<=10; i++ ))
+do  
+   az group delete --name "demo$i" --no-wait -y 
+   echo "Delete demo$i Azure Group"
+done
+
+weihan@Azure:~$ ls
+demo1.sh  demo.json  demo.sh
+
+weihan@Azure:~$ bash demo1.sh
+Delete demo1 Azure Group
+..
+Delete demo10 Azure Group
+```
+
+
+
+因為是基於 Ubuntu 所以你想要在 Azure Cloud 上面寫 Python 也沒問題 ，非常方便維運人員延續使用`之前的python腳本工具` ^_^
+
+![image-20200921224618683](https://i.loli.net/2020/09/21/vyCswHohYEdZDuT.png)
 
 
