@@ -79,157 +79,6 @@
 
 ---
 <a name="page2"></a>
-
-
-
-
-## Azure Docker - App Service - 私有 Container Registry
-
-
-
-前面公開的 docker image 可以這樣做，但是一般公司正式專案不會讓你設成公開。
-
-這時候可以使用 docker hub 專業版或是 Azuer 的 `Azure Container Registry`
-
-
-
-Azure Container Registry 方式 
-
-在 Portal 搜尋 `Container registries` 
-![image](https://user-images.githubusercontent.com/12729184/94367279-409bf800-0110-11eb-810d-7f3be23d7b01.png)
-
-
-
-選擇 `Create container regisry` 輸入名稱、地區
-
-![image](https://user-images.githubusercontent.com/12729184/94368376-4399e700-0116-11eb-93c2-724b1e54444c.png)
-
-
-
-這邊 SKU 的影響只有 Premium 可以設為 pirvate 其他不行
-
-![image](https://user-images.githubusercontent.com/12729184/94368637-ca02f880-0117-11eb-9560-ba4c017666f1.png)
-
-![image](https://user-images.githubusercontent.com/12729184/94368387-52809980-0116-11eb-9577-2c202ee19dff.png)
-
-這邊因為要`私有`所以選擇`Premium` SKU，接著可以看到可選擇`Private endpoint`選擇它
-
-![image](https://user-images.githubusercontent.com/12729184/94368569-5365fb00-0117-11eb-9fcc-bbbe02e42ab4.png)
-
-
-
-![image](https://user-images.githubusercontent.com/12729184/94368551-2a456a80-0117-11eb-9c82-f4e16a622094.png)
-
-
-
-注意假如`沒有先私有虛擬 network` 需要提前建立一個，先要搜尋 `Virtual networks`
-
-
-
-![image](https://user-images.githubusercontent.com/12729184/94368475-d6d31c80-0116-11eb-9852-e42364873461.png)
-
-選擇 `Create Virtual network`
-
-![image](https://user-images.githubusercontent.com/12729184/94368441-a8edd800-0116-11eb-92ad-cc197091e8b2.png)
-
-假如沒有特別 IP 設定，直接用預設即可
-
-![image](https://user-images.githubusercontent.com/12729184/94368519-f79b7200-0116-11eb-9584-b807b5c79e81.png)
-
-選擇好安全設定
-
-![image](https://user-images.githubusercontent.com/12729184/94368533-0d109c00-0117-11eb-9af8-039caf572d3e.png)
-
-
-
-接著會講解如何使用 CLI 上傳到 Container Registry。
-
-
-
----
-<a name="page3"></a>
-## Azure Docker - Azure Container Instances(ACI) 
-
- 
-
-像之前的例子來說，短短幾行 script 在 [Azure Cloud Shell](https://shell.azure.com/) 跑一下，等個1-2分鐘，完整的網頁服務就架起來，其中一個重要技術是借助 Azure + Docker 服務 `Azure Container Instances 簡稱 ACI` 。
-
-
-
-它有以下優點 :
-
-1. 比起 VM 架設速度更快
-2. 借助 Azure  `減少 docker 的管理複雜度`
-3. 計費模式是在容器`實際運行時按秒計費`
-
-
-
-可以說它结合了容器和 `serverless` 的優點，它讓在 Cloud 中運行容器變得非常簡單，並且`不需要預先配置任何服務器(VM)`
-
-
-
- 至於成本問題在以下情況可以比 VM `節省很多成本`
-
-- 測試環境
-- 突然情況 
-- 短期任務
-
-因為`同樣規格 [ACI 每秒單價](https://azure.microsoft.com/zh-tw/pricing/details/container-instances/) 比 VM 每秒單價 貴` ，有前輩統計大約`高10%`，這意味你的容器可以運行20個小時，才能跟一台24小時運行的 VM 成本相當。單價差可能還更大，像是活動優惠 [Azure提前保留虛擬機，最多可節省80％價錢](https://azure.microsoft.com/en-us/pricing/reserved-vm-instances/)
-
- 
-
-但，假如`方便快速最重要`不差這點錢的讀者，都使用 ACI 架設是沒問題的 XD
-
- 
-
-回到主正題: 這樣的`成本特性`跟`可快速布置`特性，是不是特別適合使用自動化CLI Script管控?
-
-像是監測系統資源不夠、故障快速自動啟用新的 ACI 分流
-
-
-
-接下章節就讓我們深入 ACI 跟自動化腳本的搭配。
-
----
-<a name="page4"></a>
-<!--
-
-TODO: 帶大家從無到有，從申請帳號到建置第一個資源依靠CLI，只需要一個腳本的事情
-
--->
-
-
-
-## Azure CLI + Powershell + ARM Template + Docker  整合從無到有快速布置網頁
-
----
-
-影片 :  
-上傳中...
-
-----
-
-這次我們整合前面幾章所學，將 Azure CLI + Powershell + ARM Template + Linux + Docker  整合做一個網頁從無到有快速布置。
-
-這樣的功能動態建立的 script 要寫多少命令呢? 
-
-只需要`短短`幾行命令 : 
-
-```powershell
-$guid = [System.guid]::NewGuid().toString("N");
-az group create --name $guid --location eastasia
-$json = az deployment group create --resource-group $guid --template-uri "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-aci-linuxcontainer-public-ip/azuredeploy.json" ;
-$docker = $json | ConvertFrom-Json ;
-$ip = $docker.properties.outputs.containerIPv4Address.value ;
-curl "http://$ip/" | grep "<title>.*</title>"
-```
-
-![image-20200924215321337](https://i.loli.net/2020/09/24/FjDe8fCx3iGKLzB.png)
-
-![image-20200924215454695](https://i.loli.net/2020/09/24/3HFM6snXYKvxVwT.png)
-
----
-<a name="page5"></a>
 ## Azure 範本 ARM Template - 基礎
 
 使用 Azure Portal 建立資源雖然有方便的GUI，但是需要經過一些專業的設定後才能正式上線，這些對於客戶、新人`需要有學習成本`，讓他們自行設定又會有`人為出錯的風險`。為此微軟提供 [ARM (Azure Resource Manager) Template](https://docs.microsoft.com/zh-tw/azure/azure-resource-manager/templates/overview)  讓維運、開發人員能建立標準化範本`只需要幾個文件，任何人都可以簡單部屬類似環境`。
@@ -283,7 +132,7 @@ ARM Template 入門的使用方式非常簡單，以建立一個 VM 為例子，
 ![image](https://user-images.githubusercontent.com/12729184/93489349-fcec0600-f939-11ea-8fb2-928befa1ed86.png)
 
 ---
-<a name="page6"></a>
+<a name="page3"></a>
 ## Azure 範本 ARM Template -  進階
 
 前面介紹了給客戶、新人的`簡單範本`分享跟建立方式，跟了解基本範本化的概念、好處，接下來進階了解 Template 的一些細節概念。
@@ -468,7 +317,7 @@ Q2的問題，我們可以使用  `parameters` + `defaultValue、min(max)Length`
 
 
 ---
-<a name="page7"></a>
+<a name="page4"></a>
 ## Azure 自動化入門- 動態屬性生成
 
 
@@ -558,7 +407,7 @@ Azure 在此有提供 `concat + uniqueString + guid`方式可以解決此問題
 
 
 ---
-<a name="page8"></a>
+<a name="page5"></a>
 ## Azure CLI 入門、工具使用
 
 
@@ -637,7 +486,7 @@ Please let us know how we are doing: https://aka.ms/azureclihats
 
 
 ---
-<a name="page9"></a>
+<a name="page6"></a>
 ## Azure CLI + Linux  - Bash 批量操作
 
 
@@ -743,7 +592,7 @@ Delete demo10 Azure Group
 
 
 ---
-<a name="page10"></a>
+<a name="page7"></a>
 ## Azure CLI + Linux + PowerShell  - 基礎
 
 
@@ -832,7 +681,7 @@ foreach ($g in $gs) {
 
 
 ---
-<a name="page11"></a>
+<a name="page8"></a>
 ## Azure CLI + PowerShell + JMESPath 動態查詢 - 進一步強化靈活性
 
 
@@ -968,7 +817,7 @@ az group list --query "name" | sort(@)
 想線上測試 JMESPath 可以到 [jsonpath online evaluator](https://jsonpath.com/) ，它很簡單，相信大家可以很快上手，變成 Azure 管理的一個小利器。
 
 ---
-<a name="page12"></a>
+<a name="page9"></a>
 ## Azure Docker - App Service 免費方案入門
 
 
@@ -1038,5 +887,156 @@ az group list --query "name" | sort(@)
 注意 : 2020年9月26號測試 Azure 只准許 `每個區域能有一個免費 Linux app service`
 
 ![image](https://user-images.githubusercontent.com/12729184/94338000-67c7cc00-0021-11eb-8d16-01f024685d39.png)
+
+---
+<a name="page10"></a>
+
+
+
+
+## Azure Docker - App Service - 私有 Container Registry
+
+
+
+前面公開的 docker image 可以這樣做，但是一般公司正式專案不會讓你設成公開。
+
+這時候可以使用 docker hub 專業版或是 Azuer 的 `Azure Container Registry`
+
+
+
+Azure Container Registry 方式 
+
+在 Portal 搜尋 `Container registries` 
+![image](https://user-images.githubusercontent.com/12729184/94367279-409bf800-0110-11eb-810d-7f3be23d7b01.png)
+
+
+
+選擇 `Create container regisry` 輸入名稱、地區
+
+![image](https://user-images.githubusercontent.com/12729184/94368376-4399e700-0116-11eb-93c2-724b1e54444c.png)
+
+
+
+這邊 SKU 的影響只有 Premium 可以設為 pirvate 其他不行
+
+![image](https://user-images.githubusercontent.com/12729184/94368637-ca02f880-0117-11eb-9560-ba4c017666f1.png)
+
+![image](https://user-images.githubusercontent.com/12729184/94368387-52809980-0116-11eb-9577-2c202ee19dff.png)
+
+這邊因為要`私有`所以選擇`Premium` SKU，接著可以看到可選擇`Private endpoint`選擇它
+
+![image](https://user-images.githubusercontent.com/12729184/94368569-5365fb00-0117-11eb-9fcc-bbbe02e42ab4.png)
+
+
+
+![image](https://user-images.githubusercontent.com/12729184/94368551-2a456a80-0117-11eb-9c82-f4e16a622094.png)
+
+
+
+注意假如`沒有先私有虛擬 network` 需要提前建立一個，先要搜尋 `Virtual networks`
+
+
+
+![image](https://user-images.githubusercontent.com/12729184/94368475-d6d31c80-0116-11eb-9852-e42364873461.png)
+
+選擇 `Create Virtual network`
+
+![image](https://user-images.githubusercontent.com/12729184/94368441-a8edd800-0116-11eb-92ad-cc197091e8b2.png)
+
+假如沒有特別 IP 設定，直接用預設即可
+
+![image](https://user-images.githubusercontent.com/12729184/94368519-f79b7200-0116-11eb-9584-b807b5c79e81.png)
+
+選擇好安全設定
+
+![image](https://user-images.githubusercontent.com/12729184/94368533-0d109c00-0117-11eb-9af8-039caf572d3e.png)
+
+
+
+接著會講解如何使用 CLI 上傳到 Container Registry。
+
+
+
+---
+<a name="page11"></a>
+## Azure Docker - Azure Container Instances(ACI) 
+
+ 
+
+像之前的例子來說，短短幾行 script 在 [Azure Cloud Shell](https://shell.azure.com/) 跑一下，等個1-2分鐘，完整的網頁服務就架起來，其中一個重要技術是借助 Azure + Docker 服務 `Azure Container Instances 簡稱 ACI` 。
+
+
+
+它有以下優點 :
+
+1. 比起 VM 架設速度更快
+2. 借助 Azure  `減少 docker 的管理複雜度`
+3. 計費模式是在容器`實際運行時按秒計費`
+
+
+
+可以說它结合了容器和 `serverless` 的優點，它讓在 Cloud 中運行容器變得非常簡單，並且`不需要預先配置任何服務器(VM)`
+
+
+
+ 至於成本問題在以下情況可以比 VM `節省很多成本`
+
+- 測試環境
+- 突然情況 
+- 短期任務
+
+因為`同樣規格 [ACI 每秒單價](https://azure.microsoft.com/zh-tw/pricing/details/container-instances/) 比 VM 每秒單價 貴` ，有前輩統計大約`高10%`，這意味你的容器可以運行20個小時，才能跟一台24小時運行的 VM 成本相當。單價差可能還更大，像是活動優惠 [Azure提前保留虛擬機，最多可節省80％價錢](https://azure.microsoft.com/en-us/pricing/reserved-vm-instances/)
+
+ 
+
+但，假如`方便快速最重要`不差這點錢的讀者，都使用 ACI 架設是沒問題的 XD
+
+ 
+
+回到主正題: 這樣的`成本特性`跟`可快速布置`特性，是不是特別適合使用自動化CLI Script管控?
+
+像是監測系統資源不夠、故障快速自動啟用新的 ACI 分流
+
+
+
+接下章節就讓我們深入 ACI 跟自動化腳本的搭配。
+
+---
+<a name="page12"></a>
+<!--
+
+TODO: 帶大家從無到有，從申請帳號到建置第一個資源依靠CLI，只需要一個腳本的事情
+
+-->
+
+
+
+## Azure CLI + Powershell + ARM Template + Docker  整合從無到有快速布置網頁
+
+---
+
+影片 :  
+上傳中...
+
+----
+
+這次我們整合前面幾章所學，將 Azure CLI + Powershell + ARM Template + Linux + Docker  整合做一個網頁從無到有快速布置。
+
+這樣的功能動態建立的 script 要寫多少命令呢? 
+
+只需要`短短`幾行命令 : 
+
+```powershell
+$guid = [System.guid]::NewGuid().toString("N");
+az group create --name $guid --location eastasia
+$json = az deployment group create --resource-group $guid --template-uri "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-aci-linuxcontainer-public-ip/azuredeploy.json" ;
+$docker = $json | ConvertFrom-Json ;
+$ip = $docker.properties.outputs.containerIPv4Address.value ;
+curl "http://$ip/" | grep "<title>.*</title>"
+```
+
+![image-20200924215321337](https://i.loli.net/2020/09/24/FjDe8fCx3iGKLzB.png)
+
+![image-20200924215454695](https://i.loli.net/2020/09/24/3HFM6snXYKvxVwT.png)
 
 
